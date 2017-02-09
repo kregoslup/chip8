@@ -1,6 +1,4 @@
-from collections import namedtuple
-
-from app.config import MEMORY_SIZE
+from app import config
 
 
 class Chip8:
@@ -46,7 +44,8 @@ class Chip8:
         }
 
         self.stack_pointer = None
-        self.memory = bytearray(MEMORY_SIZE)
+        self.memory = bytearray(config.MEMORY_SIZE)
+        self.registers = bytearray(config.REGISTERS_SIZE)
 
     def return_subroutine(self):
         pass
