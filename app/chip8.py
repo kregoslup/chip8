@@ -39,3 +39,66 @@ class Chip8:
             0xE: 'add_i_to_register',
             0x29: 'set_i_location_sprite',
         }
+
+    def return_subroutine(self):
+        pass
+
+    def jump_subroutine(self):
+        pass
+
+    def call_subroutine(self):
+        pass
+
+    def skip_next_if_equal_address(self):
+        pass
+
+    def skip_next_if_not_equal(self):
+        pass
+
+    def skip_next_if_equal_register(self):
+        pass
+
+    def skip_if_not_equal_register(self):
+        pass
+
+    def set_register(self):
+        pass
+
+    def add_register(self):
+        pass
+
+    def bitwise_or(self):
+        pass
+
+    def bitwise_and(self):
+        pass
+
+    def bitwise_xor(self):
+        pass
+
+    def shift_right(self):
+        pass
+
+    def shift_left(self):
+        pass
+
+    def add_with_carry(self):
+        pass
+
+    def substract_with_borrow(self):
+        pass
+
+    def reversed_substraction(self):
+        pass
+
+    def set_i_to_address_plus(self):
+        pass
+
+    def set_bitwise_and_random(self):
+        pass
+
+    def add_i_to_register(self):
+        pass
+
+    def set_i_location_sprite(self):
+        pass
