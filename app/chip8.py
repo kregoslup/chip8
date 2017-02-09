@@ -1,3 +1,8 @@
+from collections import namedtuple
+
+from app.config import MEMORY_SIZE
+
+
 class Chip8:
 
     def __init__(self):
@@ -39,6 +44,9 @@ class Chip8:
             0xE: 'add_i_to_register',
             0x29: 'set_i_location_sprite',
         }
+
+        self.stack_pointer = None
+        self.memory = bytearray(MEMORY_SIZE)
 
     def return_subroutine(self):
         pass
