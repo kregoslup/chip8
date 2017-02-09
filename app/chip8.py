@@ -1,4 +1,4 @@
-class Codes:
+class Chip8:
 
     flow_codes = {
         0x0: 'return_subroutine',
@@ -45,6 +45,3 @@ class Codes:
         0xE: 'add_i_to_register',
         0x29: 'set_i_location_sprite',
     }
-
-    most_significant_bit = (flow_codes, cond_codes, cond_codes)
-    least_significant_bit = (math, bit_ops, mem)
