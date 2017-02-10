@@ -47,6 +47,8 @@ class Chip8:
         self.memory = bytearray(config.MEMORY_SIZE)
         self.registers = [0] * config.REGISTERS_SIZE
         self.program_counter = 0
+        self.stack = []
+        self.memory_index = 0
 
     def return_subroutine(self):
         pass
