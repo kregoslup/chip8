@@ -49,6 +49,15 @@ class Chip8:
         self.program_counter = 0
         self.stack = []
         self.memory_index = 0
+        self.vx = 0
+        self.vy = 0
+
+    def parse_code(self):
+        self.vx = self.memory[self.program_counter] & 0x0f00
+        self.vy = self.memory[self.program_counter] & 0x00f0
+
+    def execute(self):
+        pass
 
     def return_subroutine(self):
         pass
