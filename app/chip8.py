@@ -4,59 +4,54 @@ from app import config
 class Chip8:
 
     def __init__(self):
-        self.flow_codes = {
-            0x0: 'return_subroutine',
-            0x1: 'jump_subroutine',
-            0x2: 'call_subroutine'
+        self.codes = {
+            0x00E0: self.clear_display,
+            0x00EE: self.return_subroutine,
+            0x1: self.jump_subroutine,
+            0x2: self.call_subroutine,
+            0x3: self.skip_next_if_equal_address,
+            0x4: self.skip_next_if_not_equal_address,
+            0x5: self.skip_next_if_equal_register,
+            0x6: self.set_register,
+            0x7: self.add_register,
+            0x8: self.registers_ops,
+            0x9: self.skip_if_registers_not_equal,
+            0xA: self.set_i_to_address_plus,
+            0xB: self.jump_to_address_plus_i,
+            0xC: self.set_bitwise_and_random,
+            0xE: self.add_i_to_register,
         }
-        self.cond_codes = {
-            0x3: 'skip_next_if_equal_address',
-            0x4: 'skip_next_if_not_equal',
-            0x5: 'skip_next_if_equal_register',
-            0x9: 'skip_if_not_equal_register'
-        }
-        self.const_codes = {
-            0x6: 'set_register',
-            0x7: 'add_register'
-        }
-        self.assign = {
-            0x0: 'set_register_equal'
-        }
-        self.bit_ops = {
-            0x1: 'bitwise_or',
-            0x2: 'bitwise_and',
-            0x3: 'bitwise_xor',
-            0x6: 'shift_right',
-            0xE: 'shift_left'
-        }
-        self.math = {
-            0x4: 'add_with_carry',
-            0x5: 'substract_with_borrow',
-            0x7: 'reversed_substraction'
-        }
-        self.mem = {
-            0xA: 'set_i_to_address_plus'
-        }
-        self.rand = {
-            0xC: 'set_bitwise_and_random',
-            0xE: 'add_i_to_register',
-            0x29: 'set_i_location_sprite',
+
+        self.registers_ops = {
+            0x0: self.assign_registers,
+            0x1: self.bitwise_or,
+            0x2: self.bitwise_and,
+            0x3: self.bitwise_xor,
+            0x4: self.add_with_carry,
+            0x5: self.substract_with_borrow,
+            0x6: self.shift_right,
+            0x7: self.reversed_substraction,
+            0xE: self.shift_left
         }
 
         self.stack_pointer = None
         self.memory = bytearray(config.MEMORY_SIZE)
         self.registers = [0] * config.REGISTERS_SIZE
-        self.program_counter = 0
+        self.program_counter = 0x200
         self.stack = []
         self.memory_index = 0
         self.vx = 0
         self.vy = 0
+        self.op_code = None
+
+    def cycle(self):
+        command = self.memory[self.program_counter]
 
     def parse_code(self):
         self.vx = self.memory[self.program_counter] & 0x0f00
         self.vy = self.memory[self.program_counter] & 0x00f0
 
-    def execute(self):
+    def execute_command(self):
         pass
 
     def return_subroutine(self):
@@ -71,7 +66,7 @@ class Chip8:
     def skip_next_if_equal_address(self):
         pass
 
-    def skip_next_if_not_equal(self):
+    def skip_next_if_not_equal_address(self):
         pass
 
     def skip_next_if_equal_register(self):
