@@ -1,10 +1,8 @@
 import sys
 import logging
 
-from app import config
 
-
-log = logging.getLogger(__name__)
+log = logging.getLogger()
 out_hdlr = logging.StreamHandler(sys.stdout)
 out_hdlr.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
 out_hdlr.setLevel(logging.INFO)
@@ -12,8 +10,11 @@ log.addHandler(out_hdlr)
 log.setLevel(logging.INFO)
 
 
-class Chip8:
+MEMORY_SIZE = 4096
+REGISTERS_SIZE = 16
 
+
+class Chip8:
     def __init__(self):
         self.codes = {
             0x00E0: self.clear_display,
@@ -46,8 +47,8 @@ class Chip8:
         }
 
         self.stack_pointer = None
-        self.memory = [0] * config.MEMORY_SIZE
-        self.registers = [0] * config.REGISTERS_SIZE
+        self.memory = [0] * MEMORY_SIZE
+        self.registers = [0] * REGISTERS_SIZE
         self.program_counter = 0x200
         self.stack = []
         self.memory_index = 0
