@@ -58,9 +58,11 @@ class Chip8:
     def cycle(self):
         while self.program_counter <= len(self.memory):
             command = self.memory[self.program_counter]
+            log.info('Extracted command = {}'.format(command))
             try:
                 method = self.codes[command & 0xf000]
             except KeyError:
+                log.error('Unknown command')
                 raise TypeError("Command not implemented")
             else:
                 self.vx = command & 0x0f00
