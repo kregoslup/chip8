@@ -76,7 +76,8 @@ class Chip8:
         pass
 
     def jump_subroutine(self):
-        pass
+        jump_address = self.op_code & 0x0fff
+        self.program_counter = jump_address
 
     def call_subroutine(self):
         pass
