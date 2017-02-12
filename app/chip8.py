@@ -1,4 +1,15 @@
+import sys
+import logging
+
 from app import config
+
+
+log = logging.getLogger(__name__)
+out_hdlr = logging.StreamHandler(sys.stdout)
+out_hdlr.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
+out_hdlr.setLevel(logging.INFO)
+log.addHandler(out_hdlr)
+log.setLevel(logging.INFO)
 
 
 class Chip8:
@@ -35,7 +46,7 @@ class Chip8:
         }
 
         self.stack_pointer = None
-        self.memory = bytearray(config.MEMORY_SIZE)
+        self.memory = [0] * config.MEMORY_SIZE
         self.registers = [0] * config.REGISTERS_SIZE
         self.program_counter = 0x200
         self.stack = []
@@ -45,25 +56,21 @@ class Chip8:
         self.op_code = None
 
     def cycle(self):
-        command = self.memory[self.program_counter]
-        try:
-            method = self.codes[command & 0xf000]
-        except KeyError:
-            raise TypeError("Command not implemented")
-        else:
-            self.vx = command & 0x0f00
-            self.vy = command & 0x00f0
-            if callable(method):
-                method()
+        while self.program_counter <= len(self.memory):
+            command = self.memory[self.program_counter]
+            try:
+                method = self.codes[command & 0xf000]
+            except KeyError:
+                raise TypeError("Command not implemented")
             else:
-                method[command & 0x000f]()
-
-    def parse_code(self):
-        self.vx = self.memory[self.program_counter] & 0x0f00
-        self.vy = self.memory[self.program_counter] & 0x00f0
-
-    def execute_command(self):
-        pass
+                self.vx = command & 0x0f00
+                self.vy = command & 0x00f0
+                if callable(method):
+                    method()
+                else:
+                    method[command & 0x000f]()
+                log.info('Called method {} with vx = {} and vy {}'.format(method, self.vx, self.vy))
+            self.program_counter += 2
 
     def return_subroutine(self):
         pass
