@@ -83,7 +83,10 @@ class Chip8:
         pass
 
     def skip_next_if_equal_address(self):
-        pass
+        register = self.op_code & 0x0f00
+        compare = self.op_code & 0x00ff
+        if self.registers[register] == compare:
+            self.program_counter += 2
 
     def skip_next_if_not_equal_address(self):
         pass
