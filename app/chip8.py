@@ -46,6 +46,17 @@ class Chip8:
 
     def cycle(self):
         command = self.memory[self.program_counter]
+        try:
+            method = self.codes[command & 0xf000]
+        except KeyError:
+            raise TypeError("Command not implemented")
+        else:
+            self.vx = command & 0x0f00
+            self.vy = command & 0x00f0
+            if callable(method):
+                method()
+            else:
+                method[command & 0x000f]()
 
     def parse_code(self):
         self.vx = self.memory[self.program_counter] & 0x0f00
