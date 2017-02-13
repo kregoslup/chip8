@@ -15,37 +15,37 @@ REGISTERS_SIZE = 16
 
 
 class Chip8:
+    registers_ops = {
+        0x0: self.assign_registers,
+        0x1: self.bitwise_or,
+        0x2: self.bitwise_and,
+        0x3: self.bitwise_xor,
+        0x4: self.add_with_carry,
+        0x5: self.substract_with_borrow,
+        0x6: self.shift_right,
+        0x7: self.reversed_substraction,
+        0xE: self.shift_left
+    }
+
+    codes = {
+        0x00E0: self.clear_display,
+        0x00EE: self.return_subroutine,
+        0x1: self.jump_subroutine,
+        0x2: self.call_subroutine,
+        0x3: self.skip_next_if_equal_address,
+        0x4: self.skip_next_if_not_equal_address,
+        0x5: self.skip_next_if_equal_register,
+        0x6: self.set_register,
+        0x7: self.add_register,
+        0x8: self.registers_ops,
+        0x9: self.skip_if_registers_not_equal,
+        0xA: self.set_i_to_address_plus,
+        0xB: self.jump_to_address_plus_i,
+        0xC: self.set_bitwise_and_random,
+        0xE: self.add_i_to_register,
+    }
+
     def __init__(self):
-        self.codes = {
-            0x00E0: self.clear_display,
-            0x00EE: self.return_subroutine,
-            0x1: self.jump_subroutine,
-            0x2: self.call_subroutine,
-            0x3: self.skip_next_if_equal_address,
-            0x4: self.skip_next_if_not_equal_address,
-            0x5: self.skip_next_if_equal_register,
-            0x6: self.set_register,
-            0x7: self.add_register,
-            0x8: self.registers_ops,
-            0x9: self.skip_if_registers_not_equal,
-            0xA: self.set_i_to_address_plus,
-            0xB: self.jump_to_address_plus_i,
-            0xC: self.set_bitwise_and_random,
-            0xE: self.add_i_to_register,
-        }
-
-        self.registers_ops = {
-            0x0: self.assign_registers,
-            0x1: self.bitwise_or,
-            0x2: self.bitwise_and,
-            0x3: self.bitwise_xor,
-            0x4: self.add_with_carry,
-            0x5: self.substract_with_borrow,
-            0x6: self.shift_right,
-            0x7: self.reversed_substraction,
-            0xE: self.shift_left
-        }
-
         self.stack_pointer = None
         self.memory = [0] * MEMORY_SIZE
         self.registers = [0] * REGISTERS_SIZE
@@ -73,7 +73,8 @@ class Chip8:
                 log.info('Called method {} with vx = {} and vy {}'.format(method, self.vx, self.vy))
             self.program_counter += 2
 
-    def return_subroutine(self):
+    @classmethod
+    def return_subroutine(cls):
         pass
 
     def jump_subroutine(self):
