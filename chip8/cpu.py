@@ -111,16 +111,24 @@ class Cpu:
         self.registers[register] = value
 
     def add_register(self):
-        pass
+        register = self.op_code & 0x0f00
+        value = self.op_code & 0x00ff
+        self.registers[register] += value
 
     def bitwise_or(self):
-        pass
+        register = self.op_code & 0x0f00
+        compare_or = self.op_code & 0x00ff
+        self.registers[register] |= compare_or
 
     def bitwise_and(self):
-        pass
+        register = self.op_code & 0x0f00
+        compare_or = self.op_code & 0x00ff
+        self.registers[register] &= compare_or
 
     def bitwise_xor(self):
-        pass
+        register = self.op_code & 0x0f00
+        compare_or = self.op_code & 0x00ff
+        self.registers[register] ^= compare_or
 
     def shift_right(self):
         pass
