@@ -122,13 +122,13 @@ class Cpu:
 
     def bitwise_and(self):
         register = self.op_code & 0x0f00
-        compare_or = self.op_code & 0x00ff
-        self.registers[register] &= compare_or
+        compare_and = self.op_code & 0x00ff
+        self.registers[register] &= compare_and
 
     def bitwise_xor(self):
         register = self.op_code & 0x0f00
-        compare_or = self.op_code & 0x00ff
-        self.registers[register] ^= compare_or
+        compare_xor = self.op_code & 0x00ff
+        self.registers[register] ^= compare_xor
 
     def shift_right(self):
         pass
