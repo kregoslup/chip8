@@ -16,19 +16,7 @@ REGISTERS_SIZE = 16
 
 class Cpu:
     def __init__(self):
-        registers_ops = {
-            0x0: self.assign_registers,
-            0x1: self.bitwise_or,
-            0x2: self.bitwise_and,
-            0x3: self.bitwise_xor,
-            0x4: self.add_with_carry,
-            0x5: self.substract_with_borrow,
-            0x6: self.shift_right,
-            0x7: self.reversed_substraction,
-            0xE: self.shift_left
-        }
-
-        codes = {
+        self.codes = {
             0x00E0: self.clear_display,
             0x00EE: self.return_subroutine,
             0x1: self.jump_subroutine,
@@ -44,6 +32,18 @@ class Cpu:
             0xB: self.jump_to_address_plus_i,
             0xC: self.set_bitwise_and_random,
             0xE: self.add_i_to_register,
+        }
+
+        self.registers_ops = {
+            0x0: self.assign_registers,
+            0x1: self.bitwise_or,
+            0x2: self.bitwise_and,
+            0x3: self.bitwise_xor,
+            0x4: self.add_with_carry,
+            0x5: self.substract_with_borrow,
+            0x6: self.shift_right,
+            0x7: self.reversed_substraction,
+            0xE: self.shift_left
         }
 
         self.stack_pointer = None
@@ -114,6 +114,9 @@ class Cpu:
         register = self.op_code & 0x0f00
         value = self.op_code & 0x00ff
         self.registers[register] += value
+
+    def assign_registers(self):
+        self.registers[self.op_code & 0x0f00] = self.op_code & 0x00f0
 
     def bitwise_or(self):
         register = self.op_code & 0x0f00
