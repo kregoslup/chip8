@@ -1,6 +1,6 @@
 import sys
 import logging
-
+from random import randint
 
 log = logging.getLogger()
 out_hdlr = logging.StreamHandler(sys.stdout)
@@ -140,19 +140,48 @@ class Cpu:
         pass
 
     def add_with_carry(self):
-        pass
+        register = self.registers[self.op_code & 0x0f00]
+        add = self.registers[self.op_code & 0x00f0]
+        if register + add > 0xf:
+            register = 0xf
+            self.registers[0xf] = 1
+        else:
+            register += add
 
     def substract_with_borrow(self):
-        pass
+        subtract = self.registers[self.op_code & 0x0f00]
+        subtrahent = self.registers[self.op_code & 0x00f0]
+        if subtract - subtrahent < 0:
+            subtract = 0
+            self.registers[0xf] = 1
+        else:
+            subtract -= subtrahent
 
     def reversed_substraction(self):
-        pass
+        subtrahent = self.registers[self.op_code & 0x0f00]
+        subtract = self.registers[self.op_code & 0x00f0]
+        if subtract - subtrahent < 0:
+            subtrahent = 0
+            self.registers[0xf] = 1
+        else:
+            subtrahent = subtract - subtrahent
+
+    def skip_if_registers_not_equal(self):
+        register = self.op_code & 0x0f00
+        compare = self.op_code & 0x00f0
+        if self.registers[register] != self.registers[compare]:
+            self.program_counter += 2
 
     def set_i_to_address_plus(self):
-        pass
+        self.memory_index = self.op_code & 0x0fff
+
+    def jump_to_address_plus_i(self):
+        self.program_counter = self.op_code[0] + self.op_code & 0x0fff
 
     def set_bitwise_and_random(self):
-        pass
+        register = self.registers[self.op_code & 0x0f00]
+        bitwise_and = self.op_code & 0x00ff
+        register = bitwise_and & randint(0, 255)
 
     def add_i_to_register(self):
         pass
