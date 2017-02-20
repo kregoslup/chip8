@@ -40,9 +40,9 @@ class Cpu:
             0x2: self.bitwise_and,
             0x3: self.bitwise_xor,
             0x4: self.add_with_carry,
-            0x5: self.substract_with_borrow,
+            0x5: self.subtract_with_borrow,
             0x6: self.shift_right,
-            0x7: self.reversed_substraction,
+            0x7: self.reversed_subtraction,
             0xE: self.shift_left
         }
 
@@ -140,31 +140,31 @@ class Cpu:
         pass
 
     def add_with_carry(self):
-        register = self.registers[self.op_code & 0x0f00]
-        add = self.registers[self.op_code & 0x00f0]
-        if register + add > 0xf:
-            register = 0xf
+        register = self.op_code & 0x0f00
+        add = self.op_code & 0x00f0
+        if self.registers[register] + self.registers[add] > 0xf:
+            self.registers[register] = 0xf
             self.registers[0xf] = 1
         else:
-            register += add
+            self.registers[register] += self.registers[add]
 
-    def substract_with_borrow(self):
-        subtract = self.registers[self.op_code & 0x0f00]
-        subtrahent = self.registers[self.op_code & 0x00f0]
-        if subtract - subtrahent < 0:
-            subtract = 0
+    def subtract_with_borrow(self):
+        subtract = self.op_code & 0x0f00
+        subtrahend = self.op_code & 0x00f0
+        if self.registers[subtract] - self.registers[subtrahend] < 0:
+            self.registers[subtract] = 0
             self.registers[0xf] = 1
         else:
-            subtract -= subtrahent
+            self.registers[subtract] -= self.registers[subtrahend]
 
-    def reversed_substraction(self):
-        subtrahent = self.registers[self.op_code & 0x0f00]
-        subtract = self.registers[self.op_code & 0x00f0]
-        if subtract - subtrahent < 0:
-            subtrahent = 0
+    def reversed_subtraction(self):
+        subtrahend = self.op_code & 0x0f00
+        subtract = self.op_code & 0x00f0
+        if self.registers[subtract] - subtrahend < 0:
+            self.registers[subtrahend] = 0
             self.registers[0xf] = 1
         else:
-            subtrahent = subtract - subtrahent
+            self.registers[subtrahend] = self.registers[subtract] - self.registers[subtrahend]
 
     def skip_if_registers_not_equal(self):
         register = self.op_code & 0x0f00
@@ -179,9 +179,9 @@ class Cpu:
         self.program_counter = self.op_code[0] + self.op_code & 0x0fff
 
     def set_bitwise_and_random(self):
-        register = self.registers[self.op_code & 0x0f00]
+        register = self.op_code & 0x0f00
         bitwise_and = self.op_code & 0x00ff
-        register = bitwise_and & randint(0, 255)
+        self.registers[register] = bitwise_and & randint(0, 255)
 
     def add_i_to_register(self):
         pass
