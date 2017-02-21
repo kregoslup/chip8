@@ -89,7 +89,8 @@ class Cpu:
             self.op_code = self.memory[self.program_counter]
             log.info('Extracted command = {}'.format(self.op_code))
             try:
-                method = self.codes[self.op_code & 0xf000]
+                method_code = (self.op_code & 0xf000) >> 12
+                method = self.codes[method_code]
             except KeyError:
                 log.error('Unknown command')
                 raise TypeError("Command not implemented")
@@ -99,9 +100,9 @@ class Cpu:
                 if callable(method):
                     method()
                 elif self.op_code & 0xf000 == 0xE:
-                    method[self.op_code & 0x00ff]()
+                    method[method_code][self.op_code & 0x00ff]()
                 else:
-                    method[self.op_code & 0x000f]()
+                    method[method_code][self.op_code & 0x000f]()
                 log.info('Called method {} with vx = {} and vy {}'.format(method, self.vx, self.vy))
             self.program_counter += 2
 
