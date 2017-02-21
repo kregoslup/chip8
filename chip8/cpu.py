@@ -177,7 +177,7 @@ class Cpu:
         register = self.op_code & 0x0f00
         add = self.op_code & 0x00f0
         if self.registers[register] + self.registers[add] > 0xf:
-            self.registers[register] = 0xf
+            self.registers[register] = 0
             self.registers[0xf] = 1
         else:
             self.registers[register] += self.registers[add]
