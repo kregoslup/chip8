@@ -31,7 +31,9 @@ class Cpu:
             0xA: self.set_i_to_address_plus,
             0xB: self.jump_to_address_plus_i,
             0xC: self.set_bitwise_and_random,
-            0xE: self.add_i_to_register,
+            0xD: self.draw_sprite,
+            0xE: self.key_ops,
+            0xF: self.mem_ops
         }
 
         self.registers_ops = {
@@ -45,6 +47,32 @@ class Cpu:
             0x7: self.reversed_subtraction,
             0xE: self.shift_left
         }
+
+        self.key_ops = {
+            0xE: self.skip_if_not_vx_pressed,
+            0x1: self.skip_if_not_vy_pressed,
+        }
+
+        self.mem_ops = {
+            0x07: self.set_register_to_timer,
+            0x0A: self.load_key_pressed,
+            0x15: self.set_delay_timer,
+            0x18: self.set_sound_timer,
+            0x1E: self.add_to_memory_index,
+            0x29: self.set_memory_index_to_sprite,
+            0x33: self.store_binary_coded_decimal,
+            0x55: self.dump_registers,
+            0x65: self.load_registers
+        }
+
+        self.timers = {
+            'delay': 0,
+            'sound': 0
+        }
+
+        self.fonts = [
+
+        ]
 
         self.stack_pointer = None
         self.memory = [0] * MEMORY_SIZE
@@ -68,6 +96,8 @@ class Cpu:
             else:
                 if callable(method):
                     method()
+                elif self.op_code & 0xf000 == 0xE:
+                    method[self.op_code & 0x00ff]()
                 else:
                     method[self.op_code & 0x000f]()
                 log.info('Called method {} with vx = {} and vy {}'.format(method, self.vx, self.vy))
@@ -134,10 +164,14 @@ class Cpu:
         self.registers[register] ^= compare_xor
 
     def shift_right(self):
-        pass
+        register = self.op_code & 0x0f00
+        self.registers[0xf] = self.registers[register] << 8
+        self.registers[register] <<= 1
 
     def shift_left(self):
-        pass
+        register = self.op_code & 0x0f00
+        self.registers[0xf] = self.registers[register] >> 8
+        self.registers[register] >>= 1
 
     def add_with_carry(self):
         register = self.op_code & 0x0f00
@@ -182,6 +216,37 @@ class Cpu:
         register = self.op_code & 0x0f00
         bitwise_and = self.op_code & 0x00ff
         self.registers[register] = bitwise_and & randint(0, 255)
+
+    def draw_sprite(self):
+        pass
+
+    def skip_if_not_vx_pressed(self):
+        pass
+
+    def skip_if_not_vy_pressed(self):
+        pass
+
+    def set_register_to_timer(self):
+        register = self.op_code & 0x0f
+        self.registers[register] = self.timers['delay']
+
+    def set_delay_timer(self):
+        self.timers['delay'] = self.registers[self.op_code & 0x0f]
+
+    def set_sound_timer(self):
+        self.timers['sound'] = self.registers[self.op_code & 0x0f]
+
+    def add_to_memory_index(self):
+        self.memory_index += self.registers[self.op_code & 0x0f]
+
+    def dump_registers(self):
+        for register in self.registers:
+            self.memory[self.memory_index] = register
+            self.memory_index += 1
+
+    def load_registers(self):
+        for register in range(0, len(self.registers)):
+            self.registers[register] = self.memory[self.memory_index]
 
     def add_i_to_register(self):
         pass
