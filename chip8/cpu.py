@@ -94,6 +94,8 @@ class Cpu:
                 log.error('Unknown command')
                 raise TypeError("Command not implemented")
             else:
+                self.vx = (self.op_code & 0x0f00) >> 8
+                self.vy = (self.op_code & 0x00f0) >> 4
                 if callable(method):
                     method()
                 elif self.op_code & 0xf000 == 0xE:
@@ -115,95 +117,76 @@ class Cpu:
         self.program_counter = self.op_code & 0x0fff
 
     def skip_next_if_equal_address(self):
-        register = self.op_code & 0x0f00
         compare = self.op_code & 0x00ff
-        if self.registers[register] == compare:
+        if self.registers[self.vx] == compare:
             self.program_counter += 2
 
     def skip_next_if_not_equal_address(self):
-        register = self.op_code & 0x0f00
         compare = self.op_code & 0x00ff
-        if self.registers[register] != compare:
+        if self.registers[self.vx] != compare:
             self.program_counter += 2
 
     def skip_next_if_equal_register(self):
-        register = self.op_code & 0x0f00
-        compare = self.op_code & 0x00f0
-        if self.registers[register] == self.registers[compare]:
+        if self.registers[self.vx] == self.registers[self.vy]:
             self.program_counter += 2
 
     def skip_if_not_equal_register(self):
         pass
 
     def set_register(self):
-        register = self.op_code & 0x0f00
         value = self.op_code & 0x00ff
-        self.registers[register] = value
+        self.registers[self.vx] = value
 
     def add_register(self):
-        register = self.op_code & 0x0f00
         value = self.op_code & 0x00ff
-        self.registers[register] += value
+        self.registers[self.vx] += value
 
     def assign_registers(self):
-        self.registers[self.op_code & 0x0f00] = self.op_code & 0x00f0
+        self.registers[self.vx] = self.registers[self.vy]
 
     def bitwise_or(self):
-        register = self.op_code & 0x0f00
         compare_or = self.op_code & 0x00ff
-        self.registers[register] |= compare_or
+        self.registers[self.vx] |= compare_or
 
     def bitwise_and(self):
-        register = self.op_code & 0x0f00
         compare_and = self.op_code & 0x00ff
-        self.registers[register] &= compare_and
+        self.registers[self.vx] &= compare_and
 
     def bitwise_xor(self):
-        register = self.op_code & 0x0f00
         compare_xor = self.op_code & 0x00ff
-        self.registers[register] ^= compare_xor
+        self.registers[self.vx] ^= compare_xor
 
     def shift_right(self):
-        register = self.op_code & 0x0f00
-        self.registers[0xf] = self.registers[register] << 8
-        self.registers[register] <<= 1
+        self.registers[0xf] = self.registers[self.vx] << 8
+        self.registers[self.vx] <<= 1
 
     def shift_left(self):
-        register = self.op_code & 0x0f00
-        self.registers[0xf] = self.registers[register] >> 8
-        self.registers[register] >>= 1
+        self.registers[0xf] = self.registers[self.vx] >> 8
+        self.registers[self.vx] >>= 1
 
     def add_with_carry(self):
-        register = self.op_code & 0x0f00
-        add = self.op_code & 0x00f0
-        if self.registers[register] + self.registers[add] > 0xf:
-            self.registers[register] = 0
+        if self.registers[self.vx] + self.registers[self.vy] > 0xf:
+            self.registers[self.vx] = 0
             self.registers[0xf] = 1
         else:
-            self.registers[register] += self.registers[add]
+            self.registers[self.vx] += self.registers[self.vy]
 
     def subtract_with_borrow(self):
-        subtract = self.op_code & 0x0f00
-        subtrahend = self.op_code & 0x00f0
-        if self.registers[subtract] - self.registers[subtrahend] < 0:
-            self.registers[subtract] = 0
+        if self.registers[self.vx] - self.registers[self.vy] < 0:
+            self.registers[self.vx] = 0
             self.registers[0xf] = 1
         else:
-            self.registers[subtract] -= self.registers[subtrahend]
+            self.registers[self.vx] -= self.registers[self.vy]
 
     def reversed_subtraction(self):
-        subtrahend = self.op_code & 0x0f00
-        subtract = self.op_code & 0x00f0
-        if self.registers[subtract] - subtrahend < 0:
-            self.registers[subtrahend] = 0
+        if self.registers[self.vy] - self.registers[self.vx] < 0:
+            self.registers[self.vy] = 0
             self.registers[0xf] = 1
         else:
-            self.registers[subtrahend] = self.registers[subtract] - self.registers[subtrahend]
+            self.registers[self.vy] = self.registers[self.vx] - self.registers[self.vy]
 
     def skip_if_registers_not_equal(self):
-        register = self.op_code & 0x0f00
-        compare = self.op_code & 0x00f0
-        if self.registers[register] != self.registers[compare]:
+        if self.registers[self.vx] != self.registers[self.vy]:
             self.program_counter += 2
 
     def set_i_to_address_plus(self):
@@ -213,9 +196,8 @@ class Cpu:
         self.program_counter = self.op_code[0] + self.op_code & 0x0fff
 
     def set_bitwise_and_random(self):
-        register = self.op_code & 0x0f00
         bitwise_and = self.op_code & 0x00ff
-        self.registers[register] = bitwise_and & randint(0, 255)
+        self.registers[self.vx] = bitwise_and & randint(0, 255)
 
     def draw_sprite(self):
         pass
@@ -227,17 +209,16 @@ class Cpu:
         pass
 
     def set_register_to_timer(self):
-        register = self.op_code & 0x0f
-        self.registers[register] = self.timers['delay']
+        self.registers[self.vx] = self.timers['delay']
 
     def set_delay_timer(self):
-        self.timers['delay'] = self.registers[self.op_code & 0x0f]
+        self.timers['delay'] = self.registers[self.vx]
 
     def set_sound_timer(self):
-        self.timers['sound'] = self.registers[self.op_code & 0x0f]
+        self.timers['sound'] = self.registers[self.vx]
 
     def add_to_memory_index(self):
-        self.memory_index += self.registers[self.op_code & 0x0f]
+        self.memory_index += self.registers[self.vx]
 
     def dump_registers(self):
         for register in self.registers:
