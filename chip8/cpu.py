@@ -84,6 +84,15 @@ class Cpu:
         self.vy = 0
         self.op_code = None
 
+    def load_rom(self, path):
+        with open(path, 'rb') as rom:
+            byte = rom.read()
+            index = 0
+            while byte is not None:
+                self.memory[index] = byte
+                byte = rom.read()
+                index += 1
+
     def cycle(self):
         while self.program_counter <= len(self.memory):
             self.op_code = self.memory[self.program_counter]
