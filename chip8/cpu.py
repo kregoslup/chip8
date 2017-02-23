@@ -2,6 +2,10 @@ import sys
 import logging
 from random import randint
 
+import pygame
+
+from chip8.keyboard import Keyboard
+
 log = logging.getLogger()
 out_hdlr = logging.StreamHandler(sys.stdout)
 out_hdlr.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
@@ -208,6 +212,13 @@ class Cpu:
     def set_bitwise_and_random(self):
         bitwise_and = self.op_code & 0x00ff
         self.registers[self.vx] = bitwise_and & randint(0, 255)
+
+    def load_key_pressed(self):
+        pressed = None
+        while not pressed:
+            event = pygame.event.poll()
+            pressed = Keyboard.key_mapping.get(event.type, None)
+        self.vx = pressed
 
     def draw_sprite(self):
         pass
