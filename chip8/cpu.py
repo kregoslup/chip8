@@ -3,8 +3,9 @@ import logging
 from random import randint
 
 import pygame
+from pygame import locals as key
 
-from chip8.keyboard import Keyboard
+from chip8.screen import Screen, white, black
 
 log = logging.getLogger()
 out_hdlr = logging.StreamHandler(sys.stdout)
@@ -15,6 +16,26 @@ log.setLevel(logging.INFO)
 
 MEMORY_SIZE = 4096
 REGISTERS_SIZE = 16
+
+
+KEY_MAPPINGS = {
+        key.K_0: 0x0,
+        key.K_1: 0x1,
+        key.K_2: 0x2,
+        key.K_3: 0x3,
+        key.K_4: 0x4,
+        key.K_5: 0x5,
+        key.K_6: 0x6,
+        key.K_7: 0x7,
+        key.K_8: 0x8,
+        key.K_9: 0x9,
+        key.K_a: 0xA,
+        key.K_b: 0xB,
+        key.K_c: 0xC,
+        key.K_d: 0xD,
+        key.K_e: 0xE,
+        key.K_f: 0xF
+    }
 
 
 class Cpu:
@@ -104,6 +125,8 @@ class Cpu:
         for index, font in enumerate(self.fonts):
             self.memory[index] = self.fonts[index]
 
+        self.display = Screen()
+
     def load_rom(self, path):
         with open(path, 'rb') as rom:
             byte = rom.read()
@@ -140,7 +163,7 @@ class Cpu:
             self.program_counter += 2
 
     def clear_display(self):
-        pass
+        self.display.clear()
 
     def return_subroutine(self):
         self.program_counter = self.stack.pop()
@@ -237,7 +260,7 @@ class Cpu:
         pressed = None
         while not pressed:
             event = pygame.event.poll()
-            pressed = Keyboard.key_mapping.get(event.type, None)
+            pressed = KEY_MAPPINGS.get(event.type, None)
         self.vx = pressed
 
     def set_memory_index_to_sprite(self):
@@ -256,13 +279,13 @@ class Cpu:
 
     def skip_if_vx_pressed(self):
         event = pygame.event.poll()
-        pressed = Keyboard.key_mapping.get(event.type, None)
+        pressed = KEY_MAPPINGS.get(event.type, None)
         if self.vx == pressed:
             self.program_counter += 2
 
     def skip_if_not_vx_pressed(self):
         event = pygame.event.poll()
-        pressed = Keyboard.key_mapping.get(event.type, None)
+        pressed = KEY_MAPPINGS.get(event.type, None)
         if self.vx != pressed:
             self.program_counter += 2
 
