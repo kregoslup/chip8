@@ -53,8 +53,8 @@ class Cpu:
         }
 
         self.key_ops = {
-            0xE: self.skip_if_not_vx_pressed,
-            0x1: self.skip_if_not_vy_pressed,
+            0xE: self.skip_if_vx_pressed,
+            0x1: self.skip_if_not_vx_pressed,
         }
 
         self.mem_ops = {
@@ -101,23 +101,30 @@ class Cpu:
         while self.program_counter <= len(self.memory):
             self.op_code = self.memory[self.program_counter]
             log.info('Extracted command = {}'.format(self.op_code))
-            try:
-                method_code = (self.op_code & 0xf000) >> 12
-                method = self.codes[method_code]
-            except KeyError:
-                log.error('Unknown command')
-                raise TypeError("Command not implemented")
-            else:
-                self.vx = (self.op_code & 0x0f00) >> 8
-                self.vy = (self.op_code & 0x00f0) >> 4
-                if callable(method):
-                    method()
-                elif self.op_code & 0xf000 == 0xE:
-                    method[method_code][self.op_code & 0x00ff]()
+            method = self.codes.get(self.op_code, None)
+            if not method:
+                try:
+                    method_code = (self.op_code & 0xf000) >> 12
+                    method = self.codes[method_code]
+                except KeyError:
+                    log.error('Unknown command')
+                    raise TypeError("Command not implemented")
                 else:
-                    method[method_code][self.op_code & 0x000f]()
-                log.info('Called method {} with vx = {} and vy {}'.format(method, self.vx, self.vy))
+                    self.vx = (self.op_code & 0x0f00) >> 8
+                    self.vy = (self.op_code & 0x00f0) >> 4
+                    if callable(method):
+                        method()
+                    elif self.op_code & 0xf000 == 0xE:
+                        method[method_code][self.op_code & 0x00ff]()
+                    else:
+                        method[method_code][self.op_code & 0x000f]()
+                    log.info('Called method {} with vx = {} and vy {}'.format(method, self.vx, self.vy))
+            elif callable(method):
+                method()
             self.program_counter += 2
+
+    def clear_display(self):
+        pass
 
     def return_subroutine(self):
         self.program_counter = self.stack.pop()
@@ -143,9 +150,6 @@ class Cpu:
     def skip_next_if_equal_register(self):
         if self.registers[self.vx] == self.registers[self.vy]:
             self.program_counter += 2
-
-    def skip_if_not_equal_register(self):
-        pass
 
     def set_register(self):
         value = self.op_code & 0x00ff
@@ -220,14 +224,26 @@ class Cpu:
             pressed = Keyboard.key_mapping.get(event.type, None)
         self.vx = pressed
 
+    def set_memory_index_to_sprite(self):
+        pass
+
+    def store_binary_coded_decimal(self):
+        pass
+
     def draw_sprite(self):
         pass
 
-    def skip_if_not_vx_pressed(self):
-        pass
+    def skip_if_vx_pressed(self):
+        event = pygame.event.poll()
+        pressed = Keyboard.key_mapping.get(event.type, None)
+        if self.vx == pressed:
+            self.program_counter += 2
 
-    def skip_if_not_vy_pressed(self):
-        pass
+    def skip_if_not_vx_pressed(self):
+        event = pygame.event.poll()
+        pressed = Keyboard.key_mapping.get(event.type, None)
+        if self.vx != pressed:
+            self.program_counter += 2
 
     def set_register_to_timer(self):
         self.registers[self.vx] = self.timers['delay']
