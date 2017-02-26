@@ -13,7 +13,6 @@ out_hdlr.setLevel(logging.INFO)
 log.addHandler(out_hdlr)
 log.setLevel(logging.INFO)
 
-
 MEMORY_SIZE = 4096
 REGISTERS_SIZE = 16
 
@@ -74,9 +73,23 @@ class Cpu:
             'sound': 0
         }
 
-        self.fonts = [
-
-        ]
+        self.fonts = (0xF0, 0x90, 0x90, 0x90, 0xF0,
+                      0x20, 0x60, 0x20, 0x20, 0x70,
+                      0xF0, 0x10, 0xF0, 0x80, 0xF0,
+                      0xF0, 0x10, 0xF0, 0x10, 0xF0,
+                      0x90, 0x90, 0xF0, 0x10, 0x10,
+                      0xF0, 0x80, 0xF0, 0x10, 0xF0,
+                      0xF0, 0x80, 0xF0, 0x90, 0xF0,
+                      0xF0, 0x10, 0x20, 0x40, 0x40,
+                      0xF0, 0x90, 0xF0, 0x90, 0xF0,
+                      0xF0, 0x90, 0xF0, 0x10, 0xF0,
+                      0xF0, 0x90, 0xF0, 0x90, 0x90,
+                      0xE0, 0x90, 0xE0, 0x90, 0xE0,
+                      0xF0, 0x80, 0x80, 0x80, 0xF0,
+                      0xE0, 0x90, 0x90, 0x90, 0xE0,
+                      0xF0, 0x80, 0xF0, 0x80, 0xF0,
+                      0xF0, 0x80, 0xF0, 0x80, 0x80
+                      )
 
         self.stack_pointer = None
         self.memory = [0] * MEMORY_SIZE
@@ -87,6 +100,9 @@ class Cpu:
         self.vx = 0
         self.vy = 0
         self.op_code = None
+
+        for index, font in enumerate(self.fonts):
+            self.memory[index] = self.fonts[index]
 
     def load_rom(self, path):
         with open(path, 'rb') as rom:
@@ -228,7 +244,12 @@ class Cpu:
         pass
 
     def store_binary_coded_decimal(self):
-        pass
+        bcd = self.vx
+        self.memory[self.memory_index] = self.vx // 100
+        bcd -= self.memory[self.memory_index] * 100
+        self.memory[self.memory_index + 1] = bcd // 10
+        bcd -= self.memory[self.memory_index + 1] * 10
+        self.memory[self.memory_index + 2] = bcd
 
     def draw_sprite(self):
         pass
