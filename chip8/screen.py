@@ -6,6 +6,8 @@ black = (0, 0, 0)
 
 
 class Screen:
+    BLANK_SCREEN = white
+
     def __init__(self, width=640, height=480):
         pygame.init()
         self.width = width
@@ -19,3 +21,10 @@ class Screen:
 
     def clear(self):
         self.screen.fill((white,))
+
+    def is_pixel_set(self, height, width):
+        return pygame.Color(*white) != self.display.get_surface().get_at((height, width))
+
+    def set_pixel(self, height, width):
+        self.display.get_surface().set_at((height, width), pygame.Color(*black))
+        self.display.update()

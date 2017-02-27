@@ -222,7 +222,7 @@ class Cpu:
         self.registers[self.vx] >>= 1
 
     def add_with_carry(self):
-        if self.registers[self.vx] + self.registers[self.vy] > 0xf:
+        if self.registers[self.vx] + self.registers[self.vy] > 0xff:
             self.registers[self.vx] = 0
             self.registers[0xf] = 1
         else:
@@ -264,7 +264,7 @@ class Cpu:
         self.vx = pressed
 
     def set_memory_index_to_sprite(self):
-        pass
+        self.memory_index = 5 * (self.memory[self.vx]) & 0xfff
 
     def store_binary_coded_decimal(self):
         bcd = self.vx
@@ -275,7 +275,10 @@ class Cpu:
         self.memory[self.memory_index + 2] = bcd
 
     def draw_sprite(self):
-        pass
+        self.registers[0xf] = 0
+        height = self.op_code & 0x000f
+        for i in range(height):
+
 
     def skip_if_vx_pressed(self):
         event = pygame.event.poll()
@@ -307,11 +310,5 @@ class Cpu:
             self.memory_index += 1
 
     def load_registers(self):
-        for register in range(0, len(self.registers)):
+        for register in range(len(self.registers)):
             self.registers[register] = self.memory[self.memory_index]
-
-    def add_i_to_register(self):
-        pass
-
-    def set_i_location_sprite(self):
-        pass
