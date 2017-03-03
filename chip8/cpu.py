@@ -278,7 +278,9 @@ class Cpu:
         self.registers[0xf] = 0
         height = self.op_code & 0x000f
         for i in range(height):
-
+            for bit in bin(self.memory_index + i)[:2]:
+                if bit:
+                    self.display.set_pixel(self.vx, self.vy)
 
     def skip_if_vx_pressed(self):
         event = pygame.event.poll()

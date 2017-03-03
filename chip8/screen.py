@@ -26,5 +26,6 @@ class Screen:
         return pygame.Color(*white) != self.display.get_surface().get_at((height, width))
 
     def set_pixel(self, height, width):
-        self.display.get_surface().set_at((height, width), pygame.Color(*black))
+        if not self.is_pixel_set(height, width):
+            self.display.get_surface().set_at((height, width), pygame.Color(*black))
         self.display.update()
