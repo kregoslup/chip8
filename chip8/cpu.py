@@ -214,12 +214,14 @@ class Cpu:
         self.registers[self.vx] ^= compare_xor
 
     def shift_right(self):
-        self.registers[0xf] = self.registers[self.vx] << 8
+        self.registers[0xf] = self.registers[self.vx] % 2
         self.registers[self.vx] <<= 1
+        self.registers[self.vx] /= 2
 
     def shift_left(self):
         self.registers[0xf] = self.registers[self.vx] >> 8
         self.registers[self.vx] >>= 1
+        self.registers[self.vx] *= 2
 
     def add_with_carry(self):
         if self.registers[self.vx] + self.registers[self.vy] > 0xff:
