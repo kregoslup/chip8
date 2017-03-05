@@ -37,6 +37,8 @@ KEY_MAPPINGS = {
         key.K_f: 0xF
     }
 
+SOUND = ""
+
 
 class Cpu:
     def __init__(self):
@@ -126,6 +128,7 @@ class Cpu:
             self.memory[index] = self.fonts[index]
 
         self.display = Screen()
+        pygame.mixer.music.load(SOUND)
 
     def load_rom(self, path):
         with open(path, 'rb') as rom:
@@ -161,6 +164,11 @@ class Cpu:
             elif callable(method):
                 method()
             self.program_counter += 2
+            for timer in self.timers:
+                if self.timers[timer] > 0:
+                    self.timers[timer] -= 1
+                    if timer == 'sound' and self.timers[timer] == 0:
+                        pygame.mixer.music.play(0)
 
     def clear_display(self):
         self.display.clear()
